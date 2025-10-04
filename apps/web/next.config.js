@@ -10,6 +10,19 @@ const nextConfig = {
   images: {
     domains: [],
   },
+  // Don't try to pre-render API routes during build
+  skipTrailingSlashRedirect: true,
+  // Mark API routes as dynamic
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, must-revalidate' },
+        ],
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig
