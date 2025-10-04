@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/etf-metrics/daily-update",
+      "schedule": "0 21 * * 1-5"
+    },
+    {
+      "path": "/api/economic-releases",
+      "schedule": "0 22 * * 1-5"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+# Financial Dashboard - Daily Data Update Cron Jobs
+# Runs Monday-Friday after market close (4:30 PM ET)
+#
+# Installation:
+# 1. Review this file
+# 2. Run: crontab scripts/crontab-entry.txt
+# 3. Verify: crontab -l
+#
+# To remove: crontab -r
+
+# Daily ETF and Economic Data Update
+# Runs at 4:30 PM ET on weekdays (after US market close)
+30 16 * * 1-5 cd /Users/rishabhdas/Code_Projects/Economic\ Calendar\ App && ./scripts/run-cron.sh >> logs/cron.log 2>&1
