@@ -134,13 +134,19 @@ export function getDisplayValue(indicator: EconomicIndicator): string {
   if (indicator.category === 'Inflation') {
     // For CPI, PCE, and other price indices, show YoY % change
     if (['CPIAUCSL', 'CPILFESL', 'PCEPI', 'PCEPILFE', 'CUSR0000SAM2', 'CUSR0000SEHC01'].includes(indicator.series_id)) {
+      console.log(`[${indicator.series_id}] value_yoy_pct:`, indicator.value_yoy_pct, 'yoy_change:', indicator.yoy_change)
       if (indicator.value_yoy_pct !== null && indicator.value_yoy_pct !== undefined) {
-        return `${indicator.value_yoy_pct >= 0 ? '+' : ''}${indicator.value_yoy_pct.toFixed(2)}%`
+        const result = `${indicator.value_yoy_pct >= 0 ? '+' : ''}${indicator.value_yoy_pct.toFixed(2)}%`
+        console.log(`[${indicator.series_id}] Showing YoY%:`, result)
+        return result
       }
       // Fallback: calculate from yoy_change if available
       if (indicator.yoy_change !== null && indicator.yoy_change !== undefined) {
-        return `${indicator.yoy_change >= 0 ? '+' : ''}${indicator.yoy_change.toFixed(2)}%`
+        const result = `${indicator.yoy_change >= 0 ? '+' : ''}${indicator.yoy_change.toFixed(2)}%`
+        console.log(`[${indicator.series_id}] Showing yoy_change:`, result)
+        return result
       }
+      console.log(`[${indicator.series_id}] No YoY data, falling back to formatIndicatorValue`)
     }
 
     // For YoY metrics that already store the rate
