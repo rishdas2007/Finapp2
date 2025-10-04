@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatCurrency, formatPercent } from '@/lib/utils'
 import { ETFMetricsTable } from '@/components/etf-metrics-table'
-import { ComprehensiveEconomicCalendar } from '@/components/comprehensive-economic-calendar'
+import { ComprehensiveEconomicCalendarEnhanced } from '@/components/comprehensive-economic-calendar-enhanced'
 
 export default function DashboardPage() {
   const [marketData, setMarketData] = useState<any>(null)
@@ -141,7 +141,7 @@ export default function DashboardPage() {
 
         {/* Economic Calendar */}
         <div className="mt-8">
-          <ComprehensiveEconomicCalendar />
+          <ComprehensiveEconomicCalendarEnhanced />
         </div>
       </div>
     </div>

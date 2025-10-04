@@ -64,6 +64,26 @@ export async function GET(request: NextRequest) {
 
         const trend = determineTrend(data.momChange, data.yoyChange)
 
+        // Determine display type and populate value columns
+        let valueDisplayType = 'level'
+        let valueLevel = data.value
+        let valueYoyPct = data.yoyChange
+        let valueMomPct = data.momChange
+
+        // For inflation indicators (CPI, PCE), prefer YoY % display
+        if (indicator.category === 'Inflation' &&
+            ['CPIAUCSL', 'CPILFESL', 'PCEPI', 'PCEPILFE', 'CUSR0000SAM2', 'CUSR0000SEHC01'].includes(indicator.seriesId)) {
+          valueDisplayType = 'yoy_pct'
+        } else if (indicator.presentationFormat === 'yoy_pct_change') {
+          valueDisplayType = 'yoy_pct'
+        } else if (indicator.presentationFormat === 'mom_pct_change') {
+          valueDisplayType = 'mom_pct'
+        } else if (indicator.presentationFormat === 'index') {
+          valueDisplayType = 'index'
+        } else if (indicator.presentationFormat === 'percentage') {
+          valueDisplayType = 'rate'
+        }
+
         // Update main indicator
         const { error: indicatorError } = await supabase
           .from('economic_indicators')
@@ -84,7 +104,14 @@ export async function GET(request: NextRequest) {
             trend,
             z_score: zScore,
             description: indicator.description,
-            last_updated: new Date().toISOString()
+            last_updated: new Date().toISOString(),
+            // New columns for enhanced display
+            value_display_type: valueDisplayType,
+            value_level: valueLevel,
+            value_yoy_pct: valueYoyPct,
+            value_mom_pct: valueMomPct,
+            data_as_of_date: data.date,
+            release_date: data.date
           }, {
             onConflict: 'series_id',
             ignoreDuplicates: false
