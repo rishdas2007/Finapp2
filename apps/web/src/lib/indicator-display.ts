@@ -28,6 +28,7 @@ export interface EconomicIndicator {
   z_score?: number | null
   signal?: string
   trend?: string
+  description?: string
 }
 
 /**
