@@ -10,6 +10,7 @@ export interface EconomicIndicator {
   series_id: string
   indicator_name: string
   category: string
+  timing?: string
   frequency: string
   presentation_format: string
   unit: string
