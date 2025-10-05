@@ -17,14 +17,19 @@ export async function GET(
     const days = parseInt(searchParams.get('days') || '30')
 
     // Calculate date range
+    // For short timeframes (5-30 days), fetch extra calendar days to ensure we get enough trading days
+    // Markets are closed on weekends and holidays, so 5 trading days could be 7-10 calendar days
+    const multiplier = days <= 30 ? 1.5 : days <= 90 ? 1.4 : 1.3
+    const calendarDaysToFetch = Math.ceil(days * multiplier)
+
     const endDate = new Date()
     const startDate = new Date()
-    startDate.setDate(startDate.getDate() - days)
+    startDate.setDate(startDate.getDate() - calendarDaysToFetch)
 
     const startDateStr = startDate.toISOString().split('T')[0]
     const endDateStr = endDate.toISOString().split('T')[0]
 
-    console.log(`Fetching price data for ${symbol} (${days} days)`)
+    console.log(`Fetching price data for ${symbol} (${days} trading days, ~${calendarDaysToFetch} calendar days)`)
 
     // First, try to get data from database
     // Get ALL cached data for this symbol (we'll filter by date range later)
@@ -69,7 +74,11 @@ export async function GET(
         volume: d.volume || 0
       }))
 
-      const priceValues = priceData.map(p => p.price)
+      // Limit to exactly the requested number of trading days for statistics calculation
+      // This ensures consistency with the table which uses exact trading days
+      const limitedPriceData = priceData.slice(-days)
+
+      const priceValues = limitedPriceData.map(p => p.price)
       const current = priceValues[priceValues.length - 1]
       const firstPrice = priceValues[0]
       const high = Math.max(...priceValues)
@@ -169,7 +178,9 @@ export async function GET(
     }
 
     // Calculate statistics
-    const priceValues = priceData.map(p => p.price)
+    // Limit to exactly the requested number of trading days for consistency with table
+    const limitedPriceData = priceData.slice(-days)
+    const priceValues = limitedPriceData.map(p => p.price)
     const current = priceValues[priceValues.length - 1]
     const firstPrice = priceValues[0]
     const high = Math.max(...priceValues)
