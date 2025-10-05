@@ -346,7 +346,7 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
                   {rsiChartData.length > 0 && (
                     <div className="mt-6">
                       <p className="text-xs text-muted-foreground mb-2 ml-4">RSI (14)</p>
-                      <ResponsiveContainer width="100%" height={100}>
+                      <ResponsiveContainer width="100%" height={200}>
                         <ComposedChart
                           data={rsiChartData}
                           margin={{ top: 0, right: 30, left: 20, bottom: 20 }}
