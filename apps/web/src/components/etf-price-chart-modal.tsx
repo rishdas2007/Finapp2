@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart, Bar } from 'recharts'
 import { X } from 'lucide-react'
 import { Button } from '@coinbase/cds-web/buttons'
 
@@ -32,14 +32,22 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
   const [statistics, setStatistics] = useState<PriceStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeframe, setTimeframe] = useState<number>(30) // Default 30 days
+  const [error, setError] = useState<string | null>(null)
+  const [dataSource, setDataSource] = useState<string>('')
 
   const fetchPriceData = useCallback(async () => {
     setLoading(true)
+    setError(null)
     try {
       const response = await fetch(
         `/api/etf-price-history/${symbol}?days=${timeframe}`
       )
       const data = await response.json()
+
+      if (data.error) {
+        setError(data.message || 'Failed to fetch price data')
+        return
+      }
 
       if (data.prices) {
         setPriceData(data.prices)
@@ -47,8 +55,12 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
       if (data.statistics) {
         setStatistics(data.statistics)
       }
+      if (data.source) {
+        setDataSource(data.source)
+      }
     } catch (error) {
       console.error('Error fetching price data:', error)
+      setError('Network error - unable to fetch price data')
     } finally {
       setLoading(false)
     }
@@ -74,6 +86,7 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
   const chartData = priceData.map(p => ({
     date: formatDate(p.date),
     price: p.price,
+    volume: p.volume || 0,
   }))
 
   // Calculate dynamic y-axis domain
@@ -158,7 +171,7 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
             <CardHeader>
               <CardTitle>Price History</CardTitle>
               <CardDescription>
-                {timeframe}-day price chart
+                {timeframe}-day price chart {dataSource && <span className="text-xs ml-2">• Data from {dataSource}</span>}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -166,68 +179,132 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
                 <div className="h-80 flex items-center justify-center">
                   <div className="animate-pulse text-muted-foreground">Loading chart data...</div>
                 </div>
+              ) : error ? (
+                <div className="h-80 flex flex-col items-center justify-center text-muted-foreground">
+                  <p className="text-red-600 mb-2">Error loading data</p>
+                  <p className="text-sm">{error}</p>
+                </div>
               ) : priceData.length > 0 ? (
-                <ResponsiveContainer width="100%" height={450}>
-                  <LineChart
-                    data={chartData}
-                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-                  >
-                    <defs>
-                      <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#93C5FD" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#93C5FD" stopOpacity={0.3}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      stroke="#E5E7EB"
-                      strokeWidth={1}
-                      vertical={true}
-                      horizontal={true}
-                    />
-                    <XAxis
-                      dataKey="date"
-                      stroke="#9CA3AF"
-                      style={{ fontSize: '11px' }}
-                      angle={-45}
-                      textAnchor="end"
-                      height={70}
-                      tick={{ fill: '#6B7280' }}
-                    />
-                    <YAxis
-                      stroke="#9CA3AF"
-                      style={{ fontSize: '11px' }}
-                      tickFormatter={formatPrice}
-                      domain={yAxisDomain}
-                      tick={{ fill: '#6B7280' }}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #E5E7EB',
-                        borderRadius: '8px',
-                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                      }}
-                      formatter={(value: number) => [formatPrice(value), 'Price']}
-                      labelStyle={{ color: '#111827', fontWeight: 600 }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="price"
-                      stroke="none"
-                      fill="url(#colorPrice)"
-                      fillOpacity={1}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="price"
-                      stroke="#000000"
-                      strokeWidth={2.5}
-                      dot={false}
-                      activeDot={{ r: 4, fill: '#000000' }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                <div className="space-y-6">
+                  {/* Price Chart */}
+                  <ResponsiveContainer width="100%" height={350}>
+                    <LineChart
+                      data={chartData}
+                      margin={{ top: 10, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <defs>
+                        <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#93C5FD" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#93C5FD" stopOpacity={0.3}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="#E5E7EB"
+                        strokeWidth={1}
+                        vertical={false}
+                        horizontal={true}
+                      />
+                      <XAxis
+                        dataKey="date"
+                        stroke="#9CA3AF"
+                        style={{ fontSize: '11px' }}
+                        angle={-45}
+                        textAnchor="end"
+                        height={70}
+                        tick={{ fill: '#6B7280' }}
+                      />
+                      <YAxis
+                        stroke="#9CA3AF"
+                        style={{ fontSize: '11px' }}
+                        tickFormatter={formatPrice}
+                        domain={yAxisDomain}
+                        tick={{ fill: '#6B7280' }}
+                        orientation="right"
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'white',
+                          border: '1px solid #E5E7EB',
+                          borderRadius: '8px',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                        }}
+                        formatter={(value: number) => [formatPrice(value), 'Price']}
+                        labelStyle={{ color: '#111827', fontWeight: 600 }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="price"
+                        stroke="none"
+                        fill="url(#colorPrice)"
+                        fillOpacity={1}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="price"
+                        stroke="#1a73e8"
+                        strokeWidth={2}
+                        dot={false}
+                        activeDot={{ r: 4, fill: '#1a73e8' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+
+                  {/* Volume Chart */}
+                  <div className="mt-2">
+                    <p className="text-xs text-muted-foreground mb-2 ml-4">Volume</p>
+                    <ResponsiveContainer width="100%" height={100}>
+                      <ComposedChart
+                        data={chartData}
+                        margin={{ top: 0, right: 30, left: 20, bottom: 20 }}
+                      >
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          stroke="#E5E7EB"
+                          strokeWidth={1}
+                          vertical={false}
+                          horizontal={true}
+                        />
+                        <XAxis
+                          dataKey="date"
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '10px' }}
+                          angle={-45}
+                          textAnchor="end"
+                          height={50}
+                          tick={{ fill: '#6B7280' }}
+                        />
+                        <YAxis
+                          stroke="#9CA3AF"
+                          style={{ fontSize: '10px' }}
+                          tick={{ fill: '#6B7280' }}
+                          orientation="right"
+                          tickFormatter={(value) => {
+                            if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`
+                            if (value >= 1000) return `${(value / 1000).toFixed(0)}K`
+                            return value.toString()
+                          }}
+                        />
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: 'white',
+                            border: '1px solid #E5E7EB',
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                          }}
+                          formatter={(value: number) => [value.toLocaleString(), 'Volume']}
+                          labelStyle={{ color: '#111827', fontWeight: 600 }}
+                        />
+                        <Bar
+                          dataKey="volume"
+                          fill="#93C5FD"
+                          opacity={0.6}
+                          radius={[2, 2, 0, 0]}
+                        />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               ) : (
                 <div className="h-80 flex items-center justify-center text-muted-foreground">
                   No price data available
