@@ -70,14 +70,16 @@ export async function GET(request: NextRequest) {
         let valueYoyPct = data.yoyChange
         let valueMomPct = data.momChange
 
-        // For inflation indicators (CPI, PCE), prefer YoY % display
-        if (indicator.category === 'Inflation' &&
-            ['CPIAUCSL', 'CPILFESL', 'PCEPI', 'PCEPILFE', 'CUSR0000SAM2', 'CUSR0000SEHC01'].includes(indicator.seriesId)) {
+        // For YoY indicators, data.value IS the YoY percent change (FRED returns it with units='pc1')
+        // So we should store data.value in valueYoyPct, not data.yoyChange (which is undefined or a derivative)
+        if (indicator.presentationFormat === 'yoy_pct_change') {
           valueDisplayType = 'yoy_pct'
-        } else if (indicator.presentationFormat === 'yoy_pct_change') {
-          valueDisplayType = 'yoy_pct'
+          valueYoyPct = data.value // The primary value IS the YoY %
+          valueLevel = null // No level available when using transformed units
         } else if (indicator.presentationFormat === 'mom_pct_change') {
           valueDisplayType = 'mom_pct'
+          valueMomPct = data.value // The primary value IS the MoM %
+          valueLevel = null
         } else if (indicator.presentationFormat === 'index') {
           valueDisplayType = 'index'
         } else if (indicator.presentationFormat === 'percentage') {

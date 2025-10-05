@@ -274,9 +274,9 @@ export const ECONOMIC_INDICATORS: EconomicIndicatorConfig[] = [
     category: 'Inflation',
     timing: 'Coincident',
     frequency: 'Monthly',
-    presentationFormat: 'index',
-    unit: 'Index (1982-84=100)',
-    description: 'Consumer Price Index for All Urban Consumers'
+    presentationFormat: 'yoy_pct_change',
+    unit: 'Percent',
+    description: 'Consumer Price Index for All Urban Consumers - YoY % Change'
   },
   {
     seriesId: 'CPILFESL',
@@ -284,9 +284,9 @@ export const ECONOMIC_INDICATORS: EconomicIndicatorConfig[] = [
     category: 'Inflation',
     timing: 'Coincident',
     frequency: 'Monthly',
-    presentationFormat: 'index',
-    unit: 'Index (1982-84=100)',
-    description: 'Consumer Price Index: All Items Less Food & Energy'
+    presentationFormat: 'yoy_pct_change',
+    unit: 'Percent',
+    description: 'Consumer Price Index: All Items Less Food & Energy - YoY % Change'
   },
   {
     seriesId: 'PCEPI',
@@ -294,9 +294,9 @@ export const ECONOMIC_INDICATORS: EconomicIndicatorConfig[] = [
     category: 'Inflation',
     timing: 'Coincident',
     frequency: 'Monthly',
-    presentationFormat: 'index',
-    unit: 'Index',
-    description: 'Personal Consumption Expenditures: Chain-type Price Index'
+    presentationFormat: 'yoy_pct_change',
+    unit: 'Percent',
+    description: 'Personal Consumption Expenditures: Chain-type Price Index - YoY % Change'
   },
   {
     seriesId: 'PCEPILFE',
@@ -304,9 +304,9 @@ export const ECONOMIC_INDICATORS: EconomicIndicatorConfig[] = [
     category: 'Inflation',
     timing: 'Coincident',
     frequency: 'Monthly',
-    presentationFormat: 'index',
-    unit: 'Index',
-    description: 'Personal Consumption Expenditures Excluding Food and Energy'
+    presentationFormat: 'yoy_pct_change',
+    unit: 'Percent',
+    description: 'Personal Consumption Expenditures Excluding Food and Energy - YoY % Change'
   },
   {
     seriesId: 'ULCNFB',

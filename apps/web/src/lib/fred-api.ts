@@ -167,11 +167,10 @@ export async function processFREDData(
   // Calculate changes based on frequency
   switch (presentationFormat) {
     case 'yoy_pct_change':
-      // Need value from 12 months ago for monthly, 4 quarters ago for quarterly
-      const periodsPerYear = frequency === 'Quarterly' ? 4 : frequency === 'Monthly' ? 12 : 252
-      const yearAgoValue = getValueNPeriodsAgo(observations, periodsPerYear)
-      yoyChange = calculateYoYChange(currentValue, yearAgoValue)
-      momChange = calculateMoMChange(currentValue, priorValue)
+      // When units='pc1', FRED already returns YoY % change, so currentValue IS the YoY change
+      // We should NOT calculate another derivative on top of it
+      yoyChange = undefined // Do not calculate derivative on pre-calculated YoY data
+      momChange = calculateMoMChange(currentValue, priorValue) // MoM of the YoY rate itself
       break
 
     case 'mom_pct_change':

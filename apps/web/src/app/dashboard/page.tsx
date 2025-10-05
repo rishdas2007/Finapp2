@@ -2,7 +2,7 @@
 
 import { ETFMetricsTable } from '@/components/etf-metrics-table'
 import { ComprehensiveEconomicCalendarEnhanced } from '@/components/comprehensive-economic-calendar-enhanced'
-import SpySparkChart from '@/components/spy-sparkchart'
+import MarketSignalsDashboard from '@/components/market-signals-dashboard'
 
 export default function DashboardPage() {
   return (
@@ -10,9 +10,9 @@ export default function DashboardPage() {
       <div className="container mx-auto p-8">
         <h1 className="text-4xl font-bold mb-8">Financial Dashboard</h1>
 
-        {/* SPY 30-Day Sparkchart */}
+        {/* Market Signals Dashboard */}
         <div className="mb-8">
-          <SpySparkChart />
+          <MarketSignalsDashboard />
         </div>
 
         {/* ETF Technical Metrics Table */}

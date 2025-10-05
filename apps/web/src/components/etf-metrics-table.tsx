@@ -49,7 +49,15 @@ export function ETFMetricsTable() {
           maGap: m.ma_gap,
           maTrend: m.ma_trend,
         }))
-        setEtfData(formattedData)
+
+        // Sort to put SPY first, then alphabetically
+        const sortedData = formattedData.sort((a: ETFMetric, b: ETFMetric) => {
+          if (a.symbol === 'SPY') return -1
+          if (b.symbol === 'SPY') return 1
+          return a.symbol.localeCompare(b.symbol)
+        })
+
+        setEtfData(sortedData)
         setLastUpdate(new Date(data.timestamp).toLocaleString())
       }
     } catch (error) {
@@ -138,7 +146,9 @@ export function ETFMetricsTable() {
               {etfData.map((etf) => (
                 <tr
                   key={etf.symbol}
-                  className="border-b border-border/50 hover:bg-muted/50 transition-colors cursor-pointer"
+                  className={`border-b border-border/50 hover:bg-muted/50 transition-colors cursor-pointer ${
+                    etf.symbol === 'SPY' ? 'bg-yellow-50' : ''
+                  }`}
                   onClick={() => setSelectedETF(etf)}
                   title={`Click to view ${etf.symbol} price chart`}
                 >
