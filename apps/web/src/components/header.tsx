@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@coinbase/cds-web/buttons'
-import { Text } from '@coinbase/cds-web/typography'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -36,21 +35,18 @@ export function Header() {
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/">
-            <Text weight="bold" size="xl">
-              Financial Dashboard
-            </Text>
+          <Link href="/" className="text-xl font-bold">
+            Financial Dashboard
           </Link>
           {user && (
             <nav className="hidden md:flex items-center gap-4">
-              <Link href="/dashboard">
-                <Text
-                  size="sm"
-                  color={pathname === '/dashboard' ? 'primary' : 'secondary'}
-                  className="transition-colors hover:opacity-80"
-                >
-                  Dashboard
-                </Text>
+              <Link
+                href="/dashboard"
+                className={`text-sm transition-colors hover:text-foreground ${
+                  pathname === '/dashboard' ? 'text-foreground' : 'text-muted-foreground'
+                }`}
+              >
+                Dashboard
               </Link>
             </nav>
           )}
@@ -59,9 +55,9 @@ export function Header() {
         <div className="flex items-center gap-4">
           {user ? (
             <div className="flex items-center gap-4">
-              <Text size="sm" color="secondary" className="hidden md:inline">
+              <span className="text-sm text-muted-foreground hidden md:inline">
                 {user.email}
-              </Text>
+              </span>
               <Button variant="secondary" onClick={handleSignOut}>
                 Sign Out
               </Button>
