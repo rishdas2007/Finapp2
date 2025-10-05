@@ -2,6 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { useEffect, useState } from 'react'
+import { Button } from '@coinbase/cds-web/buttons'
+import { Text } from '@coinbase/cds-web/text'
 import {
   getDisplayValue,
   getValueTypeLabel,
@@ -219,12 +221,9 @@ export function ComprehensiveEconomicCalendarEnhanced() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">📅 Economic Calendar</CardTitle>
-              <button
-                onClick={fetchIndicators}
-                className="px-3 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm"
-              >
+              <Button variant="secondary" size="sm" onClick={fetchIndicators}>
                 🔄
-              </button>
+              </Button>
             </div>
 
             <div className="text-xs text-muted-foreground">
@@ -234,20 +233,17 @@ export function ComprehensiveEconomicCalendarEnhanced() {
             {/* Category Tabs */}
             <div className="flex gap-2 flex-wrap">
               {categories.map((category) => (
-                <button
+                <Button
                   key={category}
+                  variant={activeCategory === category ? 'primary' : 'secondary'}
+                  size="xs"
                   onClick={() => {
                     setActiveCategory(category)
                     setActiveTiming(null)
                   }}
-                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    activeCategory === category
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
                 >
                   {getCategoryIcon(category)} {category}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -336,18 +332,12 @@ export function ComprehensiveEconomicCalendarEnhanced() {
             </span>
           </CardTitle>
           <div className="flex gap-2">
-            <button
-              onClick={exportToCSV}
-              className="px-3 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm"
-            >
+            <Button variant="secondary" size="sm" onClick={exportToCSV}>
               📥 Export CSV
-            </button>
-            <button
-              onClick={fetchIndicators}
-              className="px-3 py-1 rounded-md bg-primary/10 text-primary hover:bg-primary/20 transition-colors text-sm"
-            >
+            </Button>
+            <Button variant="secondary" size="sm" onClick={fetchIndicators}>
               🔄 Refresh
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -358,74 +348,59 @@ export function ComprehensiveEconomicCalendarEnhanced() {
         {/* Category Tabs */}
         <div className="flex gap-2 mt-4 flex-wrap">
           {categories.map((category) => (
-            <button
+            <Button
               key={category}
+              variant={activeCategory === category ? 'primary' : 'secondary'}
+              size="sm"
               onClick={() => {
                 setActiveCategory(category)
                 setActiveTiming(null)
               }}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeCategory === category
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
-              }`}
             >
               {getCategoryIcon(category)} {category} ({getCategoryCount(category)})
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Filters Row */}
         <div className="flex gap-2 mt-2 flex-wrap">
           {/* Timing Filter */}
-          <button
+          <Button
+            variant={activeTiming === null ? 'primary' : 'secondary'}
+            size="xs"
             onClick={() => setActiveTiming(null)}
-            className={`px-3 py-1 rounded-md text-xs transition-colors ${
-              activeTiming === null
-                ? 'bg-primary/20 text-primary'
-                : 'bg-background text-muted-foreground hover:bg-muted'
-            }`}
           >
             All Timings
-          </button>
+          </Button>
           {timings.map((timing) => (
-            <button
+            <Button
               key={timing}
+              variant={activeTiming === timing ? 'primary' : 'secondary'}
+              size="xs"
               onClick={() => setActiveTiming(timing)}
-              className={`px-3 py-1 rounded-md text-xs transition-colors border ${
-                activeTiming === timing
-                  ? getTimingBadgeColor(timing)
-                  : 'bg-background text-muted-foreground hover:bg-muted border-border'
-              }`}
             >
               {timing} ({grouped[activeCategory]?.[timing as keyof typeof grouped[typeof activeCategory]]?.length || 0})
-            </button>
+            </Button>
           ))}
 
           {/* Signal Filter */}
           <div className="border-l border-border ml-2 pl-2 flex gap-2">
-            <button
+            <Button
+              variant={signalFilter === null ? 'primary' : 'secondary'}
+              size="xs"
               onClick={() => setSignalFilter(null)}
-              className={`px-3 py-1 rounded-md text-xs transition-colors ${
-                signalFilter === null
-                  ? 'bg-primary/20 text-primary'
-                  : 'bg-background text-muted-foreground hover:bg-muted'
-              }`}
             >
               All Signals
-            </button>
+            </Button>
             {['Bullish', 'Bearish', 'Neutral'].map((signal) => (
-              <button
+              <Button
                 key={signal}
+                variant={signalFilter === signal ? 'primary' : 'secondary'}
+                size="xs"
                 onClick={() => setSignalFilter(signal)}
-                className={`px-3 py-1 rounded-md text-xs transition-colors border ${
-                  signalFilter === signal
-                    ? getSignalColor(signal)
-                    : 'bg-background text-muted-foreground hover:bg-muted border-border'
-                }`}
               >
                 {signal}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

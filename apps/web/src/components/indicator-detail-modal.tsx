@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area } from 'recharts'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Info, ExternalLink } from 'lucide-react'
+import { Button } from '@coinbase/cds-web/buttons'
+import { Text } from '@coinbase/cds-web/text'
 import { getDisplayValue, getSignalColor, type EconomicIndicator } from '@/lib/indicator-display'
 
 interface IndicatorDetailModalProps {
@@ -183,17 +185,14 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
           {/* Timeframe Selector */}
           <div className="flex gap-2">
             {[6, 12, 24, 36].map(months => (
-              <button
+              <Button
                 key={months}
+                variant={timeframe === months ? 'primary' : 'secondary'}
+                size="sm"
                 onClick={() => setTimeframe(months)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  timeframe === months
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted hover:bg-muted/80'
-                }`}
               >
                 {months}M
-              </button>
+              </Button>
             ))}
           </div>
 
