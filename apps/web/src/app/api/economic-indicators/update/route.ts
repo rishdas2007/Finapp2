@@ -66,9 +66,9 @@ export async function GET(request: NextRequest) {
 
         // Determine display type and populate value columns
         let valueDisplayType = 'level'
-        let valueLevel = data.value
-        let valueYoyPct = data.yoyChange
-        let valueMomPct = data.momChange
+        let valueLevel: number | null = data.value
+        let valueYoyPct: number | undefined = data.yoyChange
+        let valueMomPct: number | undefined = data.momChange
 
         // For YoY indicators, data.value IS the YoY percent change (FRED returns it with units='pc1')
         // So we should store data.value in valueYoyPct, not data.yoyChange (which is undefined or a derivative)
