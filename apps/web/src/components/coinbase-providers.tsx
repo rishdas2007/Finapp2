@@ -6,7 +6,7 @@ import { defaultTheme } from '@coinbase/cds-web/themes/defaultTheme'
 export function CoinbaseProviders({ children }: { children: React.ReactNode }) {
   return (
     <MediaQueryProvider>
-      <ThemeProvider theme={defaultTheme} activeColorScheme="dark">
+      <ThemeProvider theme={defaultTheme} activeColorScheme="light">
         {children}
       </ThemeProvider>
     </MediaQueryProvider>

@@ -4,26 +4,49 @@
 
 @layer base {
   :root {
-    --background: 222 47% 5%;
-    --foreground: 210 20% 98%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 20% 98%;
-    --popover: 222 47% 8%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 47% 5%;
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 65%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 217 91% 60%;
+    /* Professional Light Theme */
+    --background: 0 0% 100%; /* #FFFFFF */
+    --foreground: 222 47% 11%; /* #111827 */
+    --card: 0 0% 100%; /* #FFFFFF */
+    --card-foreground: 222 47% 11%; /* #111827 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Blue primary for professional look */
+    --primary: 221 83% 53%; /* #2563EB */
+    --primary-foreground: 0 0% 100%;
+
+    /* Gray secondary */
+    --secondary: 220 14% 96%; /* #F9FAFB */
+    --secondary-foreground: 215 16% 47%; /* #374151 */
+
+    --muted: 220 14% 96%; /* #F9FAFB */
+    --muted-foreground: 215 20% 65%; /* #6B7280 */
+
+    --accent: 220 14% 96%;
+    --accent-foreground: 222 47% 11%;
+
+    /* Amber for negative/caution */
+    --destructive: 32 95% 44%; /* #D97706 */
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 91%; /* #E5E7EB */
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
     --radius: 0.5rem;
+
+    /* Custom signal colors */
+    --signal-buy-bg: 214 95% 93%; /* #DBEAFE */
+    --signal-buy-text: 224 76% 48%; /* #1E40AF */
+    --signal-buy-border: 221 83% 53%; /* #3B82F6 */
+
+    --signal-sell-bg: 48 96% 89%; /* #FEF3C7 */
+    --signal-sell-text: 33 96% 29%; /* #92400E */
+    --signal-sell-border: 38 92% 50%; /* #F59E0B */
+
+    --signal-hold-bg: 220 14% 96%; /* #F3F4F6 */
+    --signal-hold-text: 215 16% 47%; /* #374151 */
+    --signal-hold-border: 220 9% 62%; /* #9CA3AF */
   }
 }
 
@@ -33,7 +56,23 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1, "tnum" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography Scale */
+  h1 {
+    @apply text-[28px] font-semibold text-foreground;
+  }
+
+  h2 {
+    @apply text-[18px] font-semibold text-foreground;
+  }
+
+  h3 {
+    @apply text-base font-medium text-foreground;
   }
 }
 
@@ -41,42 +80,93 @@
   .shimmer {
     background: linear-gradient(
       90deg,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0) 100%
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.02) 50%,
+      rgba(0, 0, 0, 0) 100%
     );
     background-size: 1000px 100%;
     animation: shimmer 2s infinite linear;
   }
+
+  /* Professional Signal Badges */
+  .badge-buy {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide rounded;
+    background-color: hsl(var(--signal-buy-bg));
+    color: hsl(var(--signal-buy-text));
+    border: 1px solid hsl(var(--signal-buy-border));
+  }
+
+  .badge-sell {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide rounded;
+    background-color: hsl(var(--signal-sell-bg));
+    color: hsl(var(--signal-sell-text));
+    border: 1px solid hsl(var(--signal-sell-border));
+  }
+
+  .badge-hold {
+    @apply inline-flex items-center gap-1 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide rounded;
+    background-color: hsl(var(--signal-hold-bg));
+    color: hsl(var(--signal-hold-text));
+    border: 1px solid hsl(var(--signal-hold-border));
+  }
+
+  /* Card Styling */
+  .card-professional {
+    @apply bg-card border border-border rounded-lg shadow-sm;
+  }
+
+  /* Table Improvements */
+  .table-header {
+    @apply bg-muted border-b-2 border-border px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-secondary-foreground;
+  }
+
+  .table-row {
+    @apply border-b border-gray-100 transition-colors hover:bg-muted/50 cursor-pointer;
+  }
+
+  .table-cell {
+    @apply px-4 py-4 text-sm text-foreground;
+  }
+
+  /* Focus States for Accessibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-background;
+  @apply bg-gray-100;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-muted rounded-md;
+  @apply bg-gray-300 rounded-md;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground;
+  @apply bg-gray-400;
 }
 
-/* Number formatting for financial data */
+/* Number formatting for financial data - Professional colors */
 .financial-positive {
-  @apply text-positive;
+  color: hsl(var(--signal-buy-text)); /* Blue instead of green */
 }
 
 .financial-negative {
-  @apply text-negative;
+  color: hsl(var(--signal-sell-text)); /* Amber instead of red */
 }
 
 .financial-neutral {
-  @apply text-neutral;
+  @apply text-muted-foreground;
+}
+
+/* Tabular numbers for financial data */
+.tabular-nums {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
 }

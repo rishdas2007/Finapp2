@@ -315,25 +315,34 @@ export function formatChangeValue(
 }
 
 /**
- * Get Z-score color classes
+ * Get Z-score color classes - Professional blue/amber scheme
+ * Positive Z-scores (above mean) = Blue, Negative Z-scores (below mean) = Amber
  */
 export function getZScoreColor(zScore: number | null | undefined): string {
   if (zScore === null || zScore === undefined) return 'text-gray-500'
 
   const absZ = Math.abs(zScore)
-  if (absZ > 2.0) return 'text-red-600 font-semibold'
-  if (absZ > 1.5) return 'text-orange-600 font-medium'
+  // Extreme values (>2 sigma)
+  if (absZ > 2.0) {
+    return zScore > 0 ? 'text-blue-700 font-semibold' : 'text-amber-700 font-semibold'
+  }
+  // Elevated values (>1.5 sigma)
+  if (absZ > 1.5) {
+    return zScore > 0 ? 'text-blue-600 font-medium' : 'text-amber-600 font-medium'
+  }
+  // Normal range
   return 'text-gray-600'
 }
 
 /**
- * Get signal badge color
+ * Get signal badge color - Professional accessible colors
+ * Blue for bullish (instead of green), Amber for bearish (instead of red)
  */
 export function getSignalColor(signal: string | undefined): string {
   switch (signal?.toLowerCase()) {
-    case 'bullish': return 'bg-green-100 text-green-800 border-green-200'
-    case 'bearish': return 'bg-red-100 text-red-800 border-red-200'
-    case 'neutral': return 'bg-gray-100 text-gray-800 border-gray-200'
-    default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    case 'bullish': return 'badge-buy' // Blue - professional and accessible
+    case 'bearish': return 'badge-sell' // Amber - professional and accessible
+    case 'neutral': return 'badge-hold' // Gray - neutral
+    default: return 'badge-hold'
   }
 }
