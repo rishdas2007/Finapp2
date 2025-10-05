@@ -220,7 +220,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg">📅 Economic Calendar</CardTitle>
-              <Button variant="secondary" size="sm" onClick={fetchIndicators}>
+              <Button variant="secondary" onClick={fetchIndicators}>
                 🔄
               </Button>
             </div>
@@ -235,7 +235,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                 <Button
                   key={category}
                   variant={activeCategory === category ? 'primary' : 'secondary'}
-                  size="xs"
                   onClick={() => {
                     setActiveCategory(category)
                     setActiveTiming(null)
@@ -331,10 +330,10 @@ export function ComprehensiveEconomicCalendarEnhanced() {
             </span>
           </CardTitle>
           <div className="flex gap-2">
-            <Button variant="secondary" size="sm" onClick={exportToCSV}>
+            <Button variant="secondary" onClick={exportToCSV}>
               📥 Export CSV
             </Button>
-            <Button variant="secondary" size="sm" onClick={fetchIndicators}>
+            <Button variant="secondary" onClick={fetchIndicators}>
               🔄 Refresh
             </Button>
           </div>
@@ -350,7 +349,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
             <Button
               key={category}
               variant={activeCategory === category ? 'primary' : 'secondary'}
-              size="sm"
               onClick={() => {
                 setActiveCategory(category)
                 setActiveTiming(null)
@@ -366,7 +364,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
           {/* Timing Filter */}
           <Button
             variant={activeTiming === null ? 'primary' : 'secondary'}
-            size="xs"
             onClick={() => setActiveTiming(null)}
           >
             All Timings
@@ -375,7 +372,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
             <Button
               key={timing}
               variant={activeTiming === timing ? 'primary' : 'secondary'}
-              size="xs"
               onClick={() => setActiveTiming(timing)}
             >
               {timing} ({grouped[activeCategory]?.[timing as keyof typeof grouped[typeof activeCategory]]?.length || 0})
@@ -386,7 +382,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
           <div className="border-l border-border ml-2 pl-2 flex gap-2">
             <Button
               variant={signalFilter === null ? 'primary' : 'secondary'}
-              size="xs"
               onClick={() => setSignalFilter(null)}
             >
               All Signals
@@ -395,7 +390,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
               <Button
                 key={signal}
                 variant={signalFilter === signal ? 'primary' : 'secondary'}
-                size="xs"
                 onClick={() => setSignalFilter(signal)}
               >
                 {signal}

@@ -62,19 +62,19 @@ export function Header() {
               <Text size="sm" color="secondary" className="hidden md:inline">
                 {user.email}
               </Text>
-              <Button variant="secondary" size="sm" onClick={handleSignOut}>
+              <Button variant="secondary" onClick={handleSignOut}>
                 Sign Out
               </Button>
             </div>
           ) : (
             <div className="flex items-center gap-2">
               <Link href="/auth/signin">
-                <Button variant="secondary" size="sm">
+                <Button variant="secondary">
                   Sign In
                 </Button>
               </Link>
               <Link href="/auth/signup">
-                <Button variant="primary" size="sm">
+                <Button variant="primary">
                   Sign Up
                 </Button>
               </Link>

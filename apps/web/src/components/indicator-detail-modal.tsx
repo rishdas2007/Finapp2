@@ -187,7 +187,6 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
               <Button
                 key={months}
                 variant={timeframe === months ? 'primary' : 'secondary'}
-                size="sm"
                 onClick={() => setTimeframe(months)}
               >
                 {months}M
