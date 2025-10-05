@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area } from 'recharts'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Info, ExternalLink } from 'lucide-react'
 import { Button } from '@coinbase/cds-web/buttons'
-import { Text } from '@coinbase/cds-web/text'
 import { getDisplayValue, getSignalColor, type EconomicIndicator } from '@/lib/indicator-display'
 
 interface IndicatorDetailModalProps {

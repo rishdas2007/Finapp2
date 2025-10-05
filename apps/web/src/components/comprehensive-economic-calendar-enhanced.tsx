@@ -3,7 +3,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { useEffect, useState } from 'react'
 import { Button } from '@coinbase/cds-web/buttons'
-import { Text } from '@coinbase/cds-web/text'
 import {
   getDisplayValue,
   getValueTypeLabel,

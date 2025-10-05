@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@coinbase/cds-web/buttons'
-import { Text } from '@coinbase/cds-web/text'
+import { Text } from '@coinbase/cds-web/typography'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
