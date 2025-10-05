@@ -16,6 +16,7 @@ import {
   getSignalColor,
   type EconomicIndicator
 } from '@/lib/indicator-display'
+import { IndicatorDetailModal } from './indicator-detail-modal'
 
 interface GroupedIndicators {
   [category: string]: {
@@ -40,6 +41,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
   const [expandedRow, setExpandedRow] = useState<string | null>(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [selectedIndicator, setSelectedIndicator] = useState<EconomicIndicator | null>(null)
 
   useEffect(() => {
     // Check if mobile
@@ -264,7 +266,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
               <div
                 key={indicator.series_id}
                 className="border border-border rounded-lg p-4 space-y-2 cursor-pointer hover:bg-muted/50 transition-colors"
-                onClick={() => setExpandedRow(isExpanded ? null : indicator.series_id)}
+                onClick={() => setSelectedIndicator(indicator)}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -332,6 +334,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
 
   // Desktop Table View
   return (
+    <>
     <Card>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -483,8 +486,8 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                   <tr
                     key={indicator.series_id}
                     className="border-b border-border/50 hover:bg-muted/50 transition-colors cursor-pointer"
-                    title={indicator.description}
-                    onClick={() => setExpandedRow(expandedRow === indicator.series_id ? null : indicator.series_id)}
+                    title={indicator.description || "Click to view details"}
+                    onClick={() => setSelectedIndicator(indicator)}
                   >
                     <td className="py-3 px-4">
                       <div>
@@ -539,5 +542,14 @@ export function ComprehensiveEconomicCalendarEnhanced() {
         </div>
       </CardContent>
     </Card>
+
+    {/* Indicator Detail Modal */}
+    {selectedIndicator && (
+      <IndicatorDetailModal
+        indicator={selectedIndicator}
+        onClose={() => setSelectedIndicator(null)}
+      />
+    )}
+    </>
   )
 }
