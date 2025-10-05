@@ -74,8 +74,9 @@ export class FredApiClient {
   /**
    * Get 12 months of historical data for a series
    * @param seriesId FRED series ID
+   * @param units Units transformation (default: 'lin')
    */
-  async getLast12Months(seriesId: string): Promise<FredObservationsResponse> {
+  async getLast12Months(seriesId: string, units: string = 'lin'): Promise<FredObservationsResponse> {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setMonth(startDate.getMonth() - 12)
@@ -83,7 +84,8 @@ export class FredApiClient {
     return this.getSeriesObservations(
       seriesId,
       startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
+      endDate.toISOString().split('T')[0],
+      units
     )
   }
 
@@ -91,8 +93,9 @@ export class FredApiClient {
    * Get multiple years of historical data for a series
    * @param seriesId FRED series ID
    * @param years Number of years of history (default: 5)
+   * @param units Units transformation (default: 'lin')
    */
-  async getHistoricalData(seriesId: string, years: number = 5): Promise<FredObservationsResponse> {
+  async getHistoricalData(seriesId: string, years: number = 5, units: string = 'lin'): Promise<FredObservationsResponse> {
     const endDate = new Date()
     const startDate = new Date()
     startDate.setFullYear(startDate.getFullYear() - years)
@@ -100,7 +103,8 @@ export class FredApiClient {
     return this.getSeriesObservations(
       seriesId,
       startDate.toISOString().split('T')[0],
-      endDate.toISOString().split('T')[0]
+      endDate.toISOString().split('T')[0],
+      units
     )
   }
 

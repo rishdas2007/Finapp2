@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart, Bar } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, ComposedChart, Bar, ReferenceLine } from 'recharts'
 import { X } from 'lucide-react'
 import { Button } from '@coinbase/cds-web/buttons'
 
@@ -18,6 +18,11 @@ interface PriceDataPoint {
   volume?: number
 }
 
+interface RSIDataPoint {
+  date: string
+  rsi: number
+}
+
 interface PriceStats {
   current: number
   high: number
@@ -29,6 +34,7 @@ interface PriceStats {
 
 export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModalProps) {
   const [priceData, setPriceData] = useState<PriceDataPoint[]>([])
+  const [rsiData, setRSIData] = useState<RSIDataPoint[]>([])
   const [statistics, setStatistics] = useState<PriceStats | null>(null)
   const [loading, setLoading] = useState(true)
   const [timeframe, setTimeframe] = useState<number>(30) // Default 30 days
@@ -39,24 +45,49 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(
+      // Fetch price data
+      const priceResponse = await fetch(
         `/api/etf-price-history/${symbol}?days=${timeframe}`
       )
-      const data = await response.json()
+      const priceData = await priceResponse.json()
 
-      if (data.error) {
-        setError(data.message || 'Failed to fetch price data')
+      if (priceData.error) {
+        setError(priceData.message || 'Failed to fetch price data')
         return
       }
 
-      if (data.prices) {
-        setPriceData(data.prices)
+      if (priceData.prices) {
+        setPriceData(priceData.prices)
       }
-      if (data.statistics) {
-        setStatistics(data.statistics)
+      if (priceData.statistics) {
+        setStatistics(priceData.statistics)
       }
-      if (data.source) {
-        setDataSource(data.source)
+      if (priceData.source) {
+        setDataSource(priceData.source)
+      }
+
+      // Fetch RSI indicator data
+      try {
+        const rsiResponse = await fetch(
+          `/api/etf-indicators/${symbol}?days=${timeframe}`
+        )
+        const rsiData = await rsiResponse.json()
+
+        if (rsiData.indicators && rsiData.indicators.length > 0) {
+          const formattedRSI = rsiData.indicators
+            .filter((ind: any) => ind.rsi !== null && ind.rsi !== undefined)
+            .map((ind: any) => ({
+              date: ind.date,
+              rsi: ind.rsi,
+            }))
+          setRSIData(formattedRSI)
+        } else {
+          setRSIData([])
+        }
+      } catch (rsiError) {
+        console.error('Error fetching RSI data:', rsiError)
+        // Don't fail the entire modal if RSI data is unavailable
+        setRSIData([])
       }
     } catch (error) {
       console.error('Error fetching price data:', error)
@@ -87,6 +118,12 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
     date: formatDate(p.date),
     price: p.price,
     volume: p.volume || 0,
+  }))
+
+  // Prepare RSI chart data
+  const rsiChartData = rsiData.map(r => ({
+    date: formatDate(r.date),
+    rsi: r.rsi,
   }))
 
   // Calculate dynamic y-axis domain
@@ -304,6 +341,72 @@ export function ETFPriceChartModal({ symbol, name, onClose }: ETFPriceChartModal
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
+
+                  {/* RSI Chart */}
+                  {rsiChartData.length > 0 && (
+                    <div className="mt-6">
+                      <p className="text-xs text-muted-foreground mb-2 ml-4">RSI (14)</p>
+                      <ResponsiveContainer width="100%" height={100}>
+                        <ComposedChart
+                          data={rsiChartData}
+                          margin={{ top: 0, right: 30, left: 20, bottom: 20 }}
+                        >
+                          <CartesianGrid
+                            strokeDasharray="3 3"
+                            stroke="#E5E7EB"
+                            strokeWidth={1}
+                            vertical={false}
+                            horizontal={true}
+                          />
+                          <XAxis
+                            dataKey="date"
+                            stroke="#9CA3AF"
+                            style={{ fontSize: '10px' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={50}
+                            tick={{ fill: '#6B7280' }}
+                          />
+                          <YAxis
+                            domain={[0, 100]}
+                            stroke="#9CA3AF"
+                            style={{ fontSize: '10px' }}
+                            tick={{ fill: '#6B7280' }}
+                            orientation="right"
+                          />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'white',
+                              border: '1px solid #E5E7EB',
+                              borderRadius: '8px',
+                              boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                            }}
+                            formatter={(value: number) => [value.toFixed(2), 'RSI']}
+                            labelStyle={{ color: '#111827', fontWeight: 600 }}
+                          />
+                          <ReferenceLine
+                            y={70}
+                            stroke="#DC2626"
+                            strokeDasharray="3 3"
+                            label={{ value: 'Overbought', position: 'insideTopRight', fill: '#DC2626', fontSize: 10 }}
+                          />
+                          <ReferenceLine
+                            y={30}
+                            stroke="#16A34A"
+                            strokeDasharray="3 3"
+                            label={{ value: 'Oversold', position: 'insideBottomRight', fill: '#16A34A', fontSize: 10 }}
+                          />
+                          <Line
+                            dataKey="rsi"
+                            stroke="#8B5CF6"
+                            strokeWidth={2}
+                            dot={false}
+                            activeDot={{ r: 4, fill: '#8B5CF6' }}
+                          />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="h-80 flex items-center justify-center text-muted-foreground">

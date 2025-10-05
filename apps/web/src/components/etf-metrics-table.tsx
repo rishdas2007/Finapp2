@@ -9,7 +9,7 @@ interface ETFMetric {
   name: string
   change1Day: number
   change5Day: number
-  signal: 'BUY' | 'SELL' | 'HOLD'
+  signal: 'BUY' | 'SELL' | 'HOLD' | 'STRONG BUY' | 'STRONG SELL'
   rsi: number
   rsiZ: number
   percentB: number
@@ -61,7 +61,9 @@ export function ETFMetricsTable() {
 
   const getSignalColor = (signal: string) => {
     switch (signal) {
+      case 'STRONG BUY': return 'badge-buy font-bold'
       case 'BUY': return 'badge-buy'
+      case 'STRONG SELL': return 'badge-sell font-bold'
       case 'SELL': return 'badge-sell'
       default: return 'badge-hold'
     }
@@ -77,8 +79,8 @@ export function ETFMetricsTable() {
     return value.toFixed(2)
   }
 
-  const getBuySignals = () => etfData.filter(e => e.signal === 'BUY').length
-  const getSellSignals = () => etfData.filter(e => e.signal === 'SELL').length
+  const getBuySignals = () => etfData.filter(e => e.signal === 'BUY' || e.signal === 'STRONG BUY').length
+  const getSellSignals = () => etfData.filter(e => e.signal === 'SELL' || e.signal === 'STRONG SELL').length
   const getHoldSignals = () => etfData.filter(e => e.signal === 'HOLD').length
 
   if (loading) {
@@ -157,7 +159,7 @@ export function ETFMetricsTable() {
                   </td>
                   <td className="text-center py-3 px-4">
                     <span className={`${getSignalColor(etf.signal)}`}>
-                      {etf.signal === 'BUY' ? '↗' : etf.signal === 'SELL' ? '↘' : '━'} {etf.signal}
+                      {etf.signal.includes('BUY') ? '↗' : etf.signal.includes('SELL') ? '↘' : '━'} {etf.signal}
                     </span>
                   </td>
                   <td className="text-right py-3 px-4">
@@ -185,6 +187,18 @@ export function ETFMetricsTable() {
         </div>
         <div className="mt-4 text-xs text-muted-foreground">
           Data source: Twelve Data API • Last updated: {lastUpdate}
+        </div>
+
+        {/* Signal Calculation Methodology */}
+        <div className="mt-4 p-4 bg-muted/30 rounded-lg text-sm">
+          <p className="font-semibold mb-2">Signal Calculation Methodology</p>
+          <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+            <li><strong>BUY:</strong> RSI and %B z-scores both below -1.5 (oversold conditions)</li>
+            <li><strong>SELL:</strong> RSI and %B z-scores both above +1.5 (overbought conditions)</li>
+            <li><strong>STRONG signals:</strong> Z-scores beyond ±2.0 standard deviations</li>
+            <li><strong>MA Gap enhancement:</strong> Bullish MA trend (+0.5σ) strengthens BUY, bearish trend (-0.5σ) strengthens SELL</li>
+            <li><strong>Z-scores calculated:</strong> 90-day rolling window for statistical significance</li>
+          </ul>
         </div>
       </CardContent>
 

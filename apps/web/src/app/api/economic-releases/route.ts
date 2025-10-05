@@ -10,16 +10,16 @@ const supabase = createClient(
 )
 
 const ECONOMIC_INDICATORS = [
-  { id: 'PCE', name: 'Personal Consumption Expenditures', category: 'Consumption', frequency: 'Monthly' },
-  { id: 'FEDFUNDS', name: 'Federal Funds Rate', category: 'Finance', frequency: 'Monthly' },
-  { id: 'PCEPILFE', name: 'PCE Price Index', category: 'Inflation', frequency: 'Monthly' },
-  { id: 'CPIAUCSL', name: 'Consumer Price Index', category: 'Inflation', frequency: 'Monthly' },
-  { id: 'UNRATE', name: 'Unemployment Rate', category: 'Labor', frequency: 'Monthly' },
-  { id: 'PAYEMS', name: 'Nonfarm Payrolls', category: 'Labor', frequency: 'Monthly' },
-  { id: 'INDPRO', name: 'Industrial Production Index', category: 'Growth', frequency: 'Monthly' },
-  { id: 'HOUST', name: 'Housing Starts', category: 'Housing', frequency: 'Monthly' },
-  { id: 'GDPC1', name: 'Real GDP', category: 'Growth', frequency: 'Quarterly' },
-  { id: 'GDP', name: 'Gross Domestic Product', category: 'Growth', frequency: 'Quarterly' },
+  { id: 'PCE', name: 'Personal Consumption Expenditures', category: 'Consumption', frequency: 'Monthly', units: 'pc1' },
+  { id: 'FEDFUNDS', name: 'Federal Funds Rate', category: 'Finance', frequency: 'Monthly', units: 'lin' },
+  { id: 'PCEPILFE', name: 'PCE Price Index', category: 'Inflation', frequency: 'Monthly', units: 'pc1' },
+  { id: 'CPIAUCSL', name: 'Consumer Price Index', category: 'Inflation', frequency: 'Monthly', units: 'pc1' },
+  { id: 'UNRATE', name: 'Unemployment Rate', category: 'Labor', frequency: 'Monthly', units: 'lin' },
+  { id: 'PAYEMS', name: 'Nonfarm Payrolls', category: 'Labor', frequency: 'Monthly', units: 'pc1' },
+  { id: 'INDPRO', name: 'Industrial Production Index', category: 'Growth', frequency: 'Monthly', units: 'pc1' },
+  { id: 'HOUST', name: 'Housing Starts', category: 'Housing', frequency: 'Monthly', units: 'pc1' },
+  { id: 'GDPC1', name: 'Real GDP', category: 'Growth', frequency: 'Quarterly', units: 'lin' },
+  { id: 'GDP', name: 'Gross Domestic Product', category: 'Growth', frequency: 'Quarterly', units: 'lin' },
 ]
 
 function determineSignal(current: number, prior: number, seriesId: string): string {
@@ -60,8 +60,9 @@ export async function GET(request: NextRequest) {
     for (const indicator of ECONOMIC_INDICATORS) {
       try {
         // Fetch latest 2 observations to compare
+        // Use units transformation for appropriate indicators (pc1 = Percent Change from Year Ago)
         const response = await fetch(
-          `https://api.stlouisfed.org/fred/series/observations?series_id=${indicator.id}&api_key=${apiKey}&file_type=json&limit=2&sort_order=desc`
+          `https://api.stlouisfed.org/fred/series/observations?series_id=${indicator.id}&api_key=${apiKey}&file_type=json&limit=2&sort_order=desc&units=${indicator.units}`
         )
         const result = await response.json()
 

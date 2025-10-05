@@ -26,11 +26,16 @@ export interface ProcessedIndicatorData {
 
 /**
  * Fetch data from FRED API for a specific series
+ * @param seriesId - FRED series ID
+ * @param observationStart - Start date for observations (YYYY-MM-DD)
+ * @param observationEnd - End date for observations (YYYY-MM-DD)
+ * @param units - Units transformation: 'lin' (default), 'pc1' (Percent Change from Year Ago), 'pch' (Percent Change), 'chg' (Change)
  */
 export async function fetchFREDSeries(
   seriesId: string,
   observationStart?: string,
-  observationEnd?: string
+  observationEnd?: string,
+  units: string = 'lin'
 ): Promise<FREDObservation[]> {
   const apiKey = process.env.FRED_API_KEY
 
@@ -43,6 +48,7 @@ export async function fetchFREDSeries(
     api_key: apiKey,
     file_type: 'json',
     sort_order: 'desc', // Most recent first
+    units: units,
   })
 
   if (observationStart) {
@@ -122,6 +128,7 @@ export function getValueNPeriodsAgo(
 
 /**
  * Process FRED data based on presentation format
+ * Determines appropriate units transformation for FRED API
  */
 export async function processFREDData(
   seriesId: string,
@@ -133,7 +140,15 @@ export async function processFREDData(
   twoYearsAgo.setFullYear(twoYearsAgo.getFullYear() - 2)
   const observationStart = twoYearsAgo.toISOString().split('T')[0]
 
-  const observations = await fetchFREDSeries(seriesId, observationStart)
+  // Determine units parameter based on presentation format
+  // Use 'pc1' (Percent Change from Year Ago) for YoY indicators to get pre-calculated values
+  let units = 'lin' // Default: linear (no transformation)
+
+  if (presentationFormat === 'yoy_pct_change') {
+    units = 'pc1' // Percent Change from 1 Year Ago
+  }
+
+  const observations = await fetchFREDSeries(seriesId, observationStart, undefined, units)
 
   if (observations.length === 0) {
     throw new Error(`No data available for ${seriesId}`)

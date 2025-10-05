@@ -179,20 +179,58 @@ export async function GET(request: NextRequest) {
           if (historicalMaGapValues.length >= 45 && maGap !== 0) maGapZ = calculateZScore(maGap, historicalMaGapValues)
         }
 
-        // Determine signal
+        // Statistical signal calculation based on z-scores
+        // BUY signal: RSI and %B both below -1.5 standard deviations (oversold) AND bullish MA trend
+        // SELL signal: RSI and %B both above +1.5 standard deviations (overbought) AND bearish MA trend
+        // STRONG signals: z-scores beyond ±2.0
         let signal = 'HOLD'
-        if (rsi < 30 && percentB < 20) signal = 'BUY'
-        else if (rsi > 70 && percentB > 80) signal = 'SELL'
+        let signalStrength = 0
 
-        // Calculate 1-day price change
-        const change1Day = prices.length >= 2
-          ? ((prices[prices.length - 1] - prices[prices.length - 2]) / prices[prices.length - 2]) * 100
-          : 0
+        if (rsiZ < -1.5 && percentBZ < -1.5) {
+          signal = rsiZ < -2.0 && percentBZ < -2.0 ? 'STRONG BUY' : 'BUY'
+          signalStrength = Math.abs(rsiZ) + Math.abs(percentBZ)
+          if (maGap > 0 && maGapZ > 0.5) signalStrength += 1 // Bonus for bullish MA
+        } else if (rsiZ > 1.5 && percentBZ > 1.5) {
+          signal = rsiZ > 2.0 && percentBZ > 2.0 ? 'STRONG SELL' : 'SELL'
+          signalStrength = rsiZ + percentBZ
+          if (maGap < 0 && maGapZ < -0.5) signalStrength += 1 // Bonus for bearish MA
+        }
 
-        // Calculate 5-day price change
-        const change5Day = prices.length >= 5
-          ? ((prices[prices.length - 1] - prices[prices.length - 5]) / prices[prices.length - 5]) * 100
-          : 0
+        // Calculate 1-day and 5-day price changes using our cached Yahoo Finance data
+        // This ensures consistency with the price charts displayed to users
+        const { data: priceHistory, error: priceError } = await supabase
+          .from('etf_price_history')
+          .select('date, price')
+          .eq('symbol', etf.symbol)
+          .order('date', { ascending: false })
+          .limit(6) // Get last 6 days to calculate 5-day change
+
+        let change1Day = 0
+        let change5Day = 0
+
+        if (priceHistory && priceHistory.length >= 2) {
+          const todayPrice = priceHistory[0].price
+          const yesterdayPrice = priceHistory[1].price
+          change1Day = ((todayPrice - yesterdayPrice) / yesterdayPrice) * 100
+
+          if (priceHistory.length >= 6) {
+            const price5DaysAgo = priceHistory[5].price
+            change5Day = ((todayPrice - price5DaysAgo) / price5DaysAgo) * 100
+          }
+        }
+
+        if (priceError) {
+          console.error(`Error fetching price history for ${etf.symbol}:`, priceError)
+          // Fall back to Twelve Data prices if cache is unavailable
+          const change1DayFallback = prices.length >= 2
+            ? ((prices[prices.length - 1] - prices[prices.length - 2]) / prices[prices.length - 2]) * 100
+            : 0
+          const change5DayFallback = prices.length >= 5
+            ? ((prices[prices.length - 1] - prices[prices.length - 5]) / prices[prices.length - 5]) * 100
+            : 0
+          change1Day = change1DayFallback
+          change5Day = change5DayFallback
+        }
 
         const metric = {
           symbol: etf.symbol,
