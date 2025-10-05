@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { useEffect, useState } from 'react'
+import { ETFPriceChartModal } from './etf-price-chart-modal'
 
 interface ETFMetric {
   symbol: string
@@ -21,6 +22,7 @@ export function ETFMetricsTable() {
   const [etfData, setEtfData] = useState<ETFMetric[]>([])
   const [loading, setLoading] = useState(true)
   const [lastUpdate, setLastUpdate] = useState<string>('')
+  const [selectedETF, setSelectedETF] = useState<ETFMetric | null>(null)
 
   useEffect(() => {
     fetchETFData()
@@ -59,9 +61,9 @@ export function ETFMetricsTable() {
 
   const getSignalColor = (signal: string) => {
     switch (signal) {
-      case 'BUY': return 'bg-positive/10 text-positive border-positive/20'
-      case 'SELL': return 'bg-negative/10 text-negative border-negative/20'
-      default: return 'bg-muted text-muted-foreground border-border'
+      case 'BUY': return 'badge-buy'
+      case 'SELL': return 'badge-sell'
+      default: return 'badge-hold'
     }
   }
 
@@ -105,9 +107,9 @@ export function ETFMetricsTable() {
         </CardTitle>
         <div className="flex items-center gap-4 text-sm">
           <span className="text-muted-foreground">
-            Signals: <span className="text-positive">{getBuySignals()} BUY</span>,{' '}
-            <span className="text-negative">{getSellSignals()} SELL</span>,{' '}
-            <span>{getHoldSignals()} HOLD</span>
+            Signals: <span className="financial-positive font-medium">{getBuySignals()} BUY</span>,{' '}
+            <span className="financial-negative font-medium">{getSellSignals()} SELL</span>,{' '}
+            <span className="font-medium">{getHoldSignals()} HOLD</span>
           </span>
           <button
             onClick={fetchETFData}
@@ -132,41 +134,46 @@ export function ETFMetricsTable() {
             </thead>
             <tbody>
               {etfData.map((etf) => (
-                <tr key={etf.symbol} className="border-b border-border/50 hover:bg-muted/50 transition-colors">
+                <tr
+                  key={etf.symbol}
+                  className="border-b border-border/50 hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedETF(etf)}
+                  title={`Click to view ${etf.symbol} price chart`}
+                >
                   <td className="py-3 px-4">
                     <div>
                       <div className="font-semibold">{etf.symbol}</div>
                       <div className="text-xs text-muted-foreground">{etf.name}</div>
-                      <div className={`text-xs ${etf.change1Day !== undefined && etf.change1Day >= 0 ? 'text-positive' : etf.change1Day !== undefined ? 'text-negative' : 'text-muted-foreground'}`}>
+                      <div className={`text-xs ${etf.change1Day !== undefined && etf.change1Day >= 0 ? 'financial-positive' : etf.change1Day !== undefined ? 'financial-negative' : 'text-muted-foreground'}`}>
                         {formatPercent(etf.change1Day)}
                       </div>
                     </div>
                   </td>
                   <td className="text-right py-3 px-4">
-                    <div className={etf.change5Day >= 0 ? 'text-positive' : 'text-negative'}>
+                    <div className={`tabular-nums ${etf.change5Day >= 0 ? 'financial-positive' : 'financial-negative'}`}>
                       {formatPercent(etf.change5Day)}
                     </div>
                     <div className="text-xs text-muted-foreground">5D %</div>
                   </td>
                   <td className="text-center py-3 px-4">
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium border ${getSignalColor(etf.signal)}`}>
-                      {etf.signal}
+                    <span className={`${getSignalColor(etf.signal)}`}>
+                      {etf.signal === 'BUY' ? '↗' : etf.signal === 'SELL' ? '↘' : '━'} {etf.signal}
                     </span>
                   </td>
                   <td className="text-right py-3 px-4">
-                    <div className={etf.rsi > 70 ? 'text-negative' : etf.rsi < 30 ? 'text-positive' : ''}>
+                    <div className={`tabular-nums ${etf.rsi > 70 ? 'financial-negative' : etf.rsi < 30 ? 'financial-positive' : ''}`}>
                       {formatNumber(etf.rsi)}
                     </div>
                     <div className="text-xs text-muted-foreground">Z: {formatNumber(etf.rsiZ)}</div>
                   </td>
                   <td className="text-right py-3 px-4">
-                    <div className={etf.percentB > 80 ? 'text-negative' : etf.percentB < 20 ? 'text-positive' : ''}>
+                    <div className={`tabular-nums ${etf.percentB > 80 ? 'financial-negative' : etf.percentB < 20 ? 'financial-positive' : ''}`}>
                       {formatNumber(etf.percentB)}%
                     </div>
                     <div className="text-xs text-muted-foreground">Z: {formatNumber(etf.percentBZ)}</div>
                   </td>
                   <td className="text-right py-3 px-4">
-                    <div className={etf.maGap >= 0 ? 'text-positive' : 'text-negative'}>
+                    <div className={`tabular-nums ${etf.maGap >= 0 ? 'financial-positive' : 'financial-negative'}`}>
                       {formatNumber(etf.maGap)}%
                     </div>
                     <div className="text-xs text-muted-foreground">{etf.maTrend}</div>
@@ -180,6 +187,15 @@ export function ETFMetricsTable() {
           Data source: Twelve Data API • Last updated: {lastUpdate}
         </div>
       </CardContent>
+
+      {/* ETF Price Chart Modal */}
+      {selectedETF && (
+        <ETFPriceChartModal
+          symbol={selectedETF.symbol}
+          name={selectedETF.name}
+          onClose={() => setSelectedETF(null)}
+        />
+      )}
     </Card>
   )
 }
