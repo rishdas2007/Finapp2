@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
+import '@coinbase/cds-web/globalStyles'
+import '@coinbase/cds-web/defaultFontStyles'
 import { Header } from '@/components/header'
+import { CoinbaseProviders } from '@/components/coinbase-providers'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,8 +22,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={inter.className}>
-        <Header />
-        {children}
+        <CoinbaseProviders>
+          <Header />
+          {children}
+        </CoinbaseProviders>
       </body>
     </html>
   )
