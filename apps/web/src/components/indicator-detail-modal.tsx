@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Area } from 'recharts'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Info, ExternalLink } from 'lucide-react'
 import { getDisplayValue, getSignalColor, type EconomicIndicator } from '@/lib/indicator-display'
 
@@ -211,45 +211,77 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
                   <div className="animate-pulse text-muted-foreground">Loading chart data...</div>
                 </div>
               ) : history.length > 0 ? (
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <ResponsiveContainer width="100%" height={450}>
+                  <LineChart
+                    data={chartData}
+                    margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                  >
+                    <defs>
+                      <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#93C5FD" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#93C5FD" stopOpacity={0.3}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      stroke="#E5E7EB"
+                      strokeWidth={1}
+                      vertical={true}
+                      horizontal={true}
+                    />
                     <XAxis
                       dataKey="date"
                       stroke="#9CA3AF"
-                      style={{ fontSize: '12px' }}
+                      style={{ fontSize: '11px' }}
                       angle={-45}
                       textAnchor="end"
                       height={70}
+                      tick={{ fill: '#6B7280' }}
                     />
                     <YAxis
                       stroke="#9CA3AF"
-                      style={{ fontSize: '12px' }}
+                      style={{ fontSize: '11px' }}
                       tickFormatter={formatValue}
                       domain={yAxisDomain}
+                      tick={{ fill: '#6B7280' }}
                     />
                     <Tooltip
                       contentStyle={{
-                        backgroundColor: '#1F2937',
-                        border: '1px solid #374151',
-                        borderRadius: '8px'
+                        backgroundColor: 'white',
+                        border: '1px solid #E5E7EB',
+                        borderRadius: '8px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                       }}
                       formatter={(value: number) => [formatValue(value), 'Value']}
+                      labelStyle={{ color: '#111827', fontWeight: 600 }}
                     />
-                    <Legend />
                     <ReferenceLine
                       y={statistics?.mean || 0}
-                      stroke="#EF4444"
-                      strokeDasharray="5 5"
-                      label={{ value: 'Mean', position: 'right', fill: '#EF4444' }}
+                      stroke="#3B82F6"
+                      strokeDasharray="8 4"
+                      strokeWidth={2}
+                      label={{
+                        value: `Average: ${statistics?.mean.toFixed(2)}`,
+                        position: 'insideTopRight',
+                        fill: '#3B82F6',
+                        fontSize: 12,
+                        fontWeight: 500
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="value"
+                      stroke="none"
+                      fill="url(#colorValue)"
+                      fillOpacity={1}
                     />
                     <Line
                       type="monotone"
                       dataKey="value"
-                      stroke="#3B82F6"
-                      strokeWidth={2}
-                      dot={{ fill: '#3B82F6', r: 3 }}
-                      activeDot={{ r: 5 }}
+                      stroke="#000000"
+                      strokeWidth={2.5}
+                      dot={false}
+                      activeDot={{ r: 4, fill: '#000000' }}
                     />
                   </LineChart>
                 </ResponsiveContainer>

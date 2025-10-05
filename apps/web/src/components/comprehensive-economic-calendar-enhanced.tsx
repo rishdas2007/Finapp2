@@ -326,7 +326,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
   // Desktop Table View
   return (
     <>
-    <Card>
+      <Card>
       <CardHeader>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2">
@@ -531,15 +531,15 @@ export function ComprehensiveEconomicCalendarEnhanced() {
           </table>
         </div>
       </CardContent>
-    </Card>
+      </Card>
 
-    {/* Indicator Detail Modal */}
-    {selectedIndicator && (
-      <IndicatorDetailModal
-        indicator={selectedIndicator}
-        onClose={() => setSelectedIndicator(null)}
-      />
-    )}
+      {/* Indicator Detail Modal */}
+      {selectedIndicator && (
+        <IndicatorDetailModal
+          indicator={selectedIndicator}
+          onClose={() => setSelectedIndicator(null)}
+        />
+      )}
     </>
   )
 }
