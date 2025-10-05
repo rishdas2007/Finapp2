@@ -7,9 +7,6 @@ import {
   getValueTypeLabel,
   getPriorValueLabel,
   formatChangeValue,
-  getDataFreshness,
-  getFreshnessLabel,
-  getFreshnessColor,
   formatDataDate,
   getRelativeTime,
   getZScoreColor,
@@ -85,7 +82,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
   }
 
   const exportToCSV = () => {
-    const headers = ['Indicator', 'Category', 'Timing', 'Value', 'Prior Value', 'Change', 'Signal', 'Trend', 'Z-Score', 'Date', 'Frequency']
+    const headers = ['Indicator', 'Category', 'Timing', 'Value', 'Prior Value', 'Change', 'Signal', 'Z-Score', 'Date', 'Frequency']
     const rows = indicators.map(ind => [
       ind.indicator_name,
       ind.category,
@@ -94,7 +91,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
       ind.prior_value ?? '',
       formatChangeValue(ind, ind.value, ind.prior_value),
       ind.signal ?? '',
-      ind.trend ?? '',
       ind.z_score ?? '',
       ind.date,
       ind.frequency
@@ -259,7 +255,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
 
         <CardContent className="space-y-3">
           {displayedIndicators.map((indicator) => {
-            const freshness = getDataFreshness(indicator.date, indicator.frequency)
             const isExpanded = expandedRow === indicator.series_id
 
             return (
@@ -275,8 +270,8 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                       {getValueTypeLabel(indicator)}
                     </div>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-xs border ${getFreshnessColor(freshness)}`}>
-                    {getFreshnessLabel(freshness)}
+                  <span className={`px-2 py-0.5 rounded-md text-xs border ${getTimingBadgeColor(indicator.timing ?? '')}`}>
+                    {indicator.timing}
                   </span>
                 </div>
 
@@ -311,11 +306,7 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Trend:</span>
-                      <span>{getTrendIcon(indicator.trend ?? '')} {indicator.trend}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Z-Score:</span>
+                      <span className="text-muted-foreground">Current Z-Score:</span>
                       <span className={getZScoreColor(indicator.z_score)}>
                         {indicator.z_score !== null && indicator.z_score !== undefined
                           ? `${indicator.z_score >= 0 ? '+' : ''}${indicator.z_score.toFixed(2)}σ`
@@ -452,7 +443,12 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                   Indicator {sortField === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="text-center py-3 px-4 font-medium text-muted-foreground">Timing</th>
-                <th className="text-center py-3 px-4 font-medium text-muted-foreground">Freshness</th>
+                <th
+                  className="text-center py-3 px-4 font-medium text-muted-foreground cursor-pointer hover:text-foreground"
+                  onClick={() => handleSort('date')}
+                >
+                  Date {sortField === 'date' && (sortDirection === 'asc' ? '↑' : '↓')}
+                </th>
                 <th
                   className="text-right py-3 px-4 font-medium text-muted-foreground cursor-pointer hover:text-foreground"
                   onClick={() => handleSort('value')}
@@ -469,19 +465,16 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                   Change {sortField === 'change' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
                 <th className="text-center py-3 px-4 font-medium text-muted-foreground">Signal</th>
-                <th className="text-center py-3 px-4 font-medium text-muted-foreground">Trend</th>
                 <th
                   className="text-right py-3 px-4 font-medium text-muted-foreground cursor-pointer hover:text-foreground"
                   onClick={() => handleSort('zscore')}
                 >
-                  Z-Score {sortField === 'zscore' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  Current Z-Score {sortField === 'zscore' && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
               </tr>
             </thead>
             <tbody>
               {displayedIndicators.map((indicator) => {
-                const freshness = getDataFreshness(indicator.date, indicator.frequency)
-
                 return (
                   <tr
                     key={indicator.series_id}
@@ -495,9 +488,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                         <div className="text-xs text-muted-foreground">
                           {getValueTypeLabel(indicator)}
                         </div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {formatDataDate(indicator.date, indicator.frequency)} • {getRelativeTime(indicator.date)}
-                        </div>
                       </div>
                     </td>
                     <td className="text-center py-3 px-4">
@@ -506,9 +496,12 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                       </span>
                     </td>
                     <td className="text-center py-3 px-4">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getFreshnessColor(freshness)}`}>
-                        {getFreshnessLabel(freshness)}
-                      </span>
+                      <div className="text-sm">
+                        {formatDataDate(indicator.date, indicator.frequency)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {getRelativeTime(indicator.date)}
+                      </div>
                     </td>
                     <td className="text-right py-3 px-4 font-medium">
                       {getDisplayValue(indicator)}
@@ -525,9 +518,6 @@ export function ComprehensiveEconomicCalendarEnhanced() {
                       <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${getSignalColor(indicator.signal)}`}>
                         {indicator.signal}
                       </span>
-                    </td>
-                    <td className="text-center py-3 px-4">
-                      {getTrendIcon(indicator.trend ?? '')}
                     </td>
                     <td className={`text-right py-3 px-4 font-medium ${getZScoreColor(indicator.z_score)}`}>
                       {indicator.z_score !== null && indicator.z_score !== undefined

@@ -103,6 +103,16 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
     mean: statistics?.mean || 0
   }))
 
+  // Calculate dynamic y-axis domain
+  const values = history.map(h => h.value)
+  const dataMin = values.length > 0 ? Math.min(...values) : 0
+  const dataMax = values.length > 0 ? Math.max(...values) : 100
+  const padding = (dataMax - dataMin) * 0.1 || 1 // Add 10% padding or 1 if range is 0
+  const yAxisDomain = [
+    Math.floor((dataMin - padding) * 100) / 100,
+    Math.ceil((dataMax + padding) * 100) / 100
+  ]
+
   return (
     <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-background rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
@@ -216,6 +226,7 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
                       stroke="#9CA3AF"
                       style={{ fontSize: '12px' }}
                       tickFormatter={formatValue}
+                      domain={yAxisDomain}
                     />
                     <Tooltip
                       contentStyle={{
