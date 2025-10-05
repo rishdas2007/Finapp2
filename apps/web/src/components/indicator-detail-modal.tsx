@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
 import { X, TrendingUp, TrendingDown, AlertTriangle, Info, ExternalLink } from 'lucide-react'
@@ -46,11 +46,7 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
   const [loading, setLoading] = useState(true)
   const [timeframe, setTimeframe] = useState<number>(24)
 
-  useEffect(() => {
-    fetchHistoricalData()
-  }, [indicator.series_id, timeframe])
-
-  const fetchHistoricalData = async () => {
+  const fetchHistoricalData = useCallback(async () => {
     setLoading(true)
     try {
       const response = await fetch(
@@ -72,7 +68,11 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
     } finally {
       setLoading(false)
     }
-  }
+  }, [indicator.series_id, timeframe])
+
+  useEffect(() => {
+    fetchHistoricalData()
+  }, [fetchHistoricalData])
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
@@ -351,7 +351,7 @@ export function IndicatorDetailModal({ indicator, onClose }: IndicatorDetailModa
             </CardHeader>
             <CardContent className="space-y-3 text-sm">
               <p>
-                <strong>{indicator.indicator_name}</strong> is a {indicator.timing.toLowerCase()} economic indicator
+                <strong>{indicator.indicator_name}</strong> is a {indicator.timing?.toLowerCase() || 'coincident'} economic indicator
                 in the {indicator.category} category, updated {indicator.frequency.toLowerCase()}.
               </p>
               {statistics && (
