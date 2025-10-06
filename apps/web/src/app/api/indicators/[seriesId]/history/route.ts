@@ -1,5 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { ECONOMIC_INDICATORS } from '@/config/economic-indicators'
+import { fetchFREDSeries } from '@/lib/fred-api'
+
+// Helper function to map presentation format to FRED units parameter
+function getUnitsParameter(presentationFormat: string): string {
+  if (presentationFormat === 'yoy_pct_change') {
+    return 'pc1' // Percent Change from 1 Year Ago
+  }
+  if (presentationFormat === 'mom_pct_change') {
+    return 'pch' // Percent Change
+  }
+  return 'lin' // Linear (no transformation)
+}
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -41,27 +54,39 @@ export async function GET(
       )
     }
 
+    // Find indicator configuration to get presentation format
+    const indicatorConfig = ECONOMIC_INDICATORS.find(i => i.seriesId === seriesId)
+    if (!indicatorConfig) {
+      return NextResponse.json(
+        { error: 'Indicator configuration not found' },
+        { status: 404 }
+      )
+    }
+
     // Calculate date range
     const endDate = new Date()
     const startDate = new Date()
     startDate.setMonth(startDate.getMonth() - months)
 
-    // Fetch historical data
-    const { data: history, error: historyError } = await supabase
-      .from('economic_indicator_history')
-      .select('date, value')
-      .eq('series_id', seriesId)
-      .gte('date', startDate.toISOString().split('T')[0])
-      .lte('date', endDate.toISOString().split('T')[0])
-      .order('date', { ascending: true })
+    const startDateStr = startDate.toISOString().split('T')[0]
+    const endDateStr = endDate.toISOString().split('T')[0]
 
-    if (historyError) {
-      console.error('Error fetching history:', historyError)
+    // Fetch historical data directly from FRED with correct units parameter
+    const units = getUnitsParameter(indicatorConfig.presentationFormat)
+    const observations = await fetchFREDSeries(seriesId, startDateStr, endDateStr, units)
+
+    if (!observations || observations.length === 0) {
       return NextResponse.json(
-        { error: 'Failed to fetch historical data' },
+        { error: 'Failed to fetch historical data from FRED' },
         { status: 500 }
       )
     }
+
+    // Format observations for history
+    const history = observations.map(obs => ({
+      date: obs.date,
+      value: parseFloat(obs.value)
+    })).reverse() // Reverse to get chronological order (fetchFREDSeries returns desc)
 
     // Calculate statistics if requested
     let stats = null

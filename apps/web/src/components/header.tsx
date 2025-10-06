@@ -35,9 +35,30 @@ export function Header() {
     <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-xl font-bold">
-            Financial Dashboard
-          </Link>
+          <div className="flex flex-col">
+            <Link href="/" className="text-xl font-bold">
+              Rishabh's Financial Dashboard
+            </Link>
+            <div className="flex items-center gap-3 mt-0.5">
+              <a
+                href="https://rishabhdas.substack.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Substack
+              </a>
+              <span className="text-xs text-muted-foreground">•</span>
+              <a
+                href="https://www.linkedin.com/in/rishabh-das/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                LinkedIn
+              </a>
+            </div>
+          </div>
           {user && (
             <nav className="hidden md:flex items-center gap-4">
               <Link
