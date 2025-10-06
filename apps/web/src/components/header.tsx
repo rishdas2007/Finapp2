@@ -37,7 +37,7 @@ export function Header() {
         <div className="flex items-center gap-6">
           <div className="flex flex-col">
             <Link href="/" className="text-xl font-bold">
-              Rishabh's Financial Dashboard
+              Rishabh&apos;s Financial Dashboard
             </Link>
             <div className="flex items-center gap-3 mt-0.5">
               <a
