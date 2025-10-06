@@ -3,6 +3,8 @@
 import { ETFMetricsTable } from '@/components/etf-metrics-table'
 import { ComprehensiveEconomicCalendarEnhanced } from '@/components/comprehensive-economic-calendar-enhanced'
 import MarketSignalsDashboard from '@/components/market-signals-dashboard'
+import { EconomicRegimeDashboard } from '@/components/economic-regime-dashboard'
+import { RelativeStrengthDashboard } from '@/components/relative-strength-dashboard'
 
 export default function DashboardPage() {
   return (
@@ -11,6 +13,16 @@ export default function DashboardPage() {
         {/* Market Signals Dashboard */}
         <div className="mb-8">
           <MarketSignalsDashboard />
+        </div>
+
+        {/* Economic Regime & Sector Playbook */}
+        <div className="mt-8">
+          <EconomicRegimeDashboard />
+        </div>
+
+        {/* Relative Strength Rankings */}
+        <div className="mt-8">
+          <RelativeStrengthDashboard />
         </div>
 
         {/* ETF Technical Metrics Table */}
