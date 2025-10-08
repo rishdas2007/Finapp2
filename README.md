@@ -2,6 +2,8 @@
 
 A comprehensive financial dashboard application for individual investors and financial professionals featuring real-time market data, economic analysis, and advanced technical indicators.
 
+**Live Dashboard**: [https://rishabh-finance-web.vercel.app/dashboard](https://rishabh-finance-web.vercel.app/dashboard)
+
 ## Features
 
 ### 🎯 Core Capabilities
